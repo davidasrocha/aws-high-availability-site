@@ -1,0 +1,211 @@
+Parameters:
+
+  VPCCidrBlock:
+    Type: String
+
+  ProjectName:
+    Type: String
+
+  EnvironmentName:
+    Type: String
+
+  PublicSubNet1CIDR:
+    Type: String
+
+  PublicSubNet2CIDR:
+    Type: String
+
+  PrivateSubNet1CIDR:
+    Type: String
+
+  PrivateSubNet2CIDR:
+    Type: String
+
+Resources:
+
+  VPCHighAvailabilitySite:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VPCCidrBlock
+      Tags: 
+        - Key: ProjectName
+          Value: !Sub ${ProjectName}
+        - Key: EnvironmentName
+          Value: !Sub ${EnvironmentName}
+
+  PrivateSubnet1HighAvailabilitySite:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: !Ref PrivateSubNet1CIDR
+      VpcId: !Ref VPCHighAvailabilitySite
+      MapPublicIpOnLaunch: false
+      AvailabilityZone: !Select [ 0, !GetAZs '' ]
+      Tags: 
+        - Key: ProjectName
+          Value: !Sub ${ProjectName}
+        - Key: EnvironmentName
+          Value: !Sub ${EnvironmentName}
+
+  PrivateSubnet2HighAvailabilitySite:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: !Ref PrivateSubNet2CIDR
+      VpcId: !Ref VPCHighAvailabilitySite
+      MapPublicIpOnLaunch: false
+      AvailabilityZone: !Select [ 1, !GetAZs '' ]
+      Tags: 
+        - Key: ProjectName
+          Value: !Sub ${ProjectName}
+        - Key: EnvironmentName
+          Value: !Sub ${EnvironmentName}
+
+  PublicSubnet1HighAvailabilitySite:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: !Ref PublicSubNet1CIDR
+      VpcId: !Ref VPCHighAvailabilitySite
+      MapPublicIpOnLaunch: false
+      AvailabilityZone: !Select [ 0, !GetAZs '' ]
+      Tags: 
+        - Key: ProjectName
+          Value: !Sub ${ProjectName}
+        - Key: EnvironmentName
+          Value: !Sub ${EnvironmentName}
+
+  PublicSubnet2HighAvailabilitySite:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: !Ref PublicSubNet2CIDR
+      VpcId: !Ref VPCHighAvailabilitySite
+      MapPublicIpOnLaunch: false
+      AvailabilityZone: !Select [ 1, !GetAZs '' ]
+      Tags: 
+        - Key: ProjectName
+          Value: !Sub ${ProjectName}
+        - Key: EnvironmentName
+          Value: !Sub ${EnvironmentName}
+
+  InternetGatewayHighAvailabilitySite:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags: 
+        - Key: ProjectName
+          Value: !Sub ${ProjectName}
+        - Key: EnvironmentName
+          Value: !Sub ${EnvironmentName} 
+
+  AttachInternetGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGatewayHighAvailabilitySite
+      VpcId: !Ref VPCHighAvailabilitySite
+
+  NATGateway1EPIHighAvailabilitySite:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+    DependsOn: AttachInternetGateway
+
+  NATGateway2EPIHighAvailabilitySite:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+    DependsOn: AttachInternetGateway
+
+  NATGateway1HighAvailabilitySite:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      SubnetId: !Ref PublicSubnet1HighAvailabilitySite
+      AllocationId: !GetAtt NATGateway1EPIHighAvailabilitySite.AllocationId
+      Tags: 
+        - Key: ProjectName
+          Value: !Sub ${ProjectName}
+        - Key: EnvironmentName
+          Value: !Sub ${EnvironmentName} 
+
+  NATGateway2HighAvailabilitySite:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      SubnetId: !Ref PublicSubnet2HighAvailabilitySite
+      AllocationId: !GetAtt NATGateway2EPIHighAvailabilitySite.AllocationId
+      Tags: 
+        - Key: ProjectName
+          Value: !Sub ${ProjectName}
+        - Key: EnvironmentName
+          Value: !Sub ${EnvironmentName} 
+
+  PublicRouteTableHighAvailabilitySite:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPCHighAvailabilitySite
+      Tags: 
+        - Key: ProjectName
+          Value: !Sub ${ProjectName}
+        - Key: EnvironmentName
+          Value: !Sub ${EnvironmentName} 
+
+  PublicRouteHighAvailabilitySite:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PublicRouteTableHighAvailabilitySite
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGatewayHighAvailabilitySite
+    DependsOn: AttachInternetGateway
+
+  PublicRouteAssociationSubNet1HighAvailabilitySite:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTableHighAvailabilitySite
+      SubnetId: !Ref PublicSubnet1HighAvailabilitySite
+
+  PublicRouteAssociationSubNet2HighAvailabilitySite:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTableHighAvailabilitySite
+      SubnetId: !Ref PublicSubnet2HighAvailabilitySite
+
+  PrivateRouteTable1HighAvailabilitySite:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPCHighAvailabilitySite
+      Tags: 
+        - Key: ProjectName
+          Value: !Sub ${ProjectName}
+        - Key: EnvironmentName
+          Value: !Sub ${EnvironmentName} 
+
+  PrivateRouteSubNet1HighAvailabilitySite:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable1HighAvailabilitySite
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NATGateway1HighAvailabilitySite
+
+  PrivateRouteAssociationSubNet1HighAvailabilitySite:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable1HighAvailabilitySite
+      SubnetId: !Ref PrivateSubnet1HighAvailabilitySite
+
+  PrivateRouteTable2HighAvailabilitySite:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPCHighAvailabilitySite
+      Tags: 
+        - Key: ProjectName
+          Value: !Sub ${ProjectName}
+        - Key: EnvironmentName
+          Value: !Sub ${EnvironmentName} 
+
+  PrivateRouteSubNet2HighAvailabilitySite:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable2HighAvailabilitySite
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NATGateway2HighAvailabilitySite
+
+  PrivateRouteAssociationSubNet2HighAvailabilitySite:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable2HighAvailabilitySite
+      SubnetId: !Ref PrivateSubnet2HighAvailabilitySite
