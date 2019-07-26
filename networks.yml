@@ -45,6 +45,8 @@ Resources:
           Value: !Sub ${ProjectName}
         - Key: EnvironmentName
           Value: !Sub ${EnvironmentName}
+        - Key: "PrivateNETName"
+          Value: !Sub "${EnvironmentName}-PRIVATE-NETS"
 
   PrivateSubnet2HighAvailabilitySite:
     Type: AWS::EC2::Subnet
@@ -58,6 +60,8 @@ Resources:
           Value: !Sub ${ProjectName}
         - Key: EnvironmentName
           Value: !Sub ${EnvironmentName}
+        - Key: "PrivateNETName"
+          Value: !Sub "${EnvironmentName}-PRIVATE-NETS"
 
   PublicSubnet1HighAvailabilitySite:
     Type: AWS::EC2::Subnet
