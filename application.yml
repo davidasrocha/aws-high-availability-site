@@ -269,6 +269,8 @@ Resources:
       MinSize: !Sub ${AutoScalingGroupMinSize}
       MaxSize: !Sub ${AutoScalingGroupMaxSize}
       HealthCheckGracePeriod: 10
+      TargetGroupARNs:
+        - !Ref WebApplicationTargetGroupHighAvailabilitySite
 
 # load balancer
   LoadBalancerSecurityGroupHighAvailabilitySite:
