@@ -1,5 +1,6 @@
 Parameters:
 
+# network
   VPCCidrBlock:
     Type: String
 
@@ -21,8 +22,25 @@ Parameters:
   PrivateSubNet2CIDR:
     Type: String
 
+# servers
+  InstanceType:
+    Type: String
+
+  ImageId:
+    Type: String
+
+  VolumeSize:
+    Type: String
+
+  AutoScalingGroupMinSize:
+    Type: String
+
+  AutoScalingGroupMaxSize:
+    Type: String
+
 Resources:
 
+# network
   VPCHighAvailabilitySite:
     Type: AWS::EC2::VPC
     Properties:
@@ -45,8 +63,6 @@ Resources:
           Value: !Sub ${ProjectName}
         - Key: EnvironmentName
           Value: !Sub ${EnvironmentName}
-        - Key: "PrivateNETName"
-          Value: !Sub "${EnvironmentName}-PRIVATE-NETS"
 
   PrivateSubnet2HighAvailabilitySite:
     Type: AWS::EC2::Subnet
@@ -60,8 +76,6 @@ Resources:
           Value: !Sub ${ProjectName}
         - Key: EnvironmentName
           Value: !Sub ${EnvironmentName}
-        - Key: "PrivateNETName"
-          Value: !Sub "${EnvironmentName}-PRIVATE-NETS"
 
   PublicSubnet1HighAvailabilitySite:
     Type: AWS::EC2::Subnet
@@ -213,3 +227,45 @@ Resources:
     Properties:
       RouteTableId: !Ref PrivateRouteTable2HighAvailabilitySite
       SubnetId: !Ref PrivateSubnet2HighAvailabilitySite
+
+# servers
+
+  SecurityGroupHighAvailabilitySite:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Web Application Security Group
+      SecurityGroupEgress:
+        - IpProtocol: "tcp"
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: "0.0.0.0/0"
+      SecurityGroupIngress:
+        - IpProtocol: "tcp"
+          FromPort: 80
+          ToPort: 80
+          CidrIp: "0.0.0.0/0"
+      VpcId: !Ref VPCHighAvailabilitySite
+
+  LaunchConfigurationHighAvailabilitySite:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      ImageId: !Sub ${ImageId}
+      InstanceType: !Sub ${InstanceType}
+      SecurityGroups:
+        - Ref: SecurityGroupHighAvailabilitySite
+      BlockDeviceMappings:
+        - DeviceName: "/dev/sdk"
+          Ebs:
+            VolumeSize: !Sub ${VolumeSize}
+
+  AutoScalingGroupHighAvailabilitySite:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      LaunchConfigurationName: 
+        Ref: LaunchConfigurationHighAvailabilitySite
+      VPCZoneIdentifier: 
+        - !Ref PrivateSubnet1HighAvailabilitySite
+        - !Ref PrivateSubnet2HighAvailabilitySite
+      MinSize: !Sub ${AutoScalingGroupMinSize}
+      MaxSize: !Sub ${AutoScalingGroupMaxSize}
+      HealthCheckGracePeriod: 10
