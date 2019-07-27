@@ -40,6 +40,12 @@ Parameters:
 
 Resources:
 
+  ProfileWithRolesForOurApp:
+    Type: AWS::IAM::InstanceProfile
+    Properties: 
+      Roles:
+        - UdacityS3ReadOnlyEC2
+
 # network
   VPCHighAvailabilitySite:
     Type: AWS::EC2::VPC
@@ -256,6 +262,7 @@ Resources:
             apt-get install -y unzip awscli nginx
       ImageId: !Sub ${ImageId}
       InstanceType: !Sub ${InstanceType}
+      IamInstanceProfile: !Ref ProfileWithRolesForOurApp
       SecurityGroups:
         - Ref: SecurityGroupHighAvailabilitySite
       BlockDeviceMappings:
