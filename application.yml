@@ -253,7 +253,7 @@ Resources:
           Fn::Base64: !Sub |
             #!/bin/bash
             apt-get update -y
-            apt-get install -y nginx
+            apt-get install -y unzip awscli nginx
       ImageId: !Sub ${ImageId}
       InstanceType: !Sub ${InstanceType}
       SecurityGroups:
