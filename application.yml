@@ -271,12 +271,30 @@ Resources:
       HealthCheckGracePeriod: 10
 
 # load balancer
+  LoadBalancerSecurityGroupHighAvailabilitySite:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Load Balancer Application Security Group
+      SecurityGroupEgress:
+        - IpProtocol: "tcp"
+          FromPort: 80
+          ToPort: 80
+          CidrIp: "0.0.0.0/0"
+      SecurityGroupIngress:
+        - IpProtocol: "tcp"
+          FromPort: 80
+          ToPort: 80
+          CidrIp: "0.0.0.0/0"
+      VpcId: !Ref VPCHighAvailabilitySite
+
   WebApplicationLoadBalancerHighAvailabilitySite:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
       Subnets:
         - !Ref PublicSubnet1HighAvailabilitySite
         - !Ref PublicSubnet2HighAvailabilitySite
+      SecurityGroups: 
+        - !Ref LoadBalancerSecurityGroupHighAvailabilitySite
 
   WebApplicationTargetGroupHighAvailabilitySite:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
