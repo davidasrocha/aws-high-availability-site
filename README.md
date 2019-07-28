@@ -1,10 +1,11 @@
 # About the project
 
 This is the second project of the Udacity Nanodegree Program "Cloud Dev Ops Engineer".
-
 The objective was to deploy an Infrastructure using Code to run a High Available WebApp.
 
-## How to run
+You can take a look in the infrastructure diagram [here](https://raw.githubusercontent.com/davidasrocha/aws-high-availability-site/master/cloud-infrastructure-diagrams/aws-high-availability-site.png).
+
+### How to run
 
 First, you need to have configured **AWS CLI** in your computer.
 
@@ -38,6 +39,6 @@ aws cloudformation delete-stack \
     --region=us-west-2
 ```
 
-## How to access WebApp
+### How to access WebApp
 
 After create or update a stack, you can use exported value **WebAppPublicAddress** to access de public webapp address in any web browser.
