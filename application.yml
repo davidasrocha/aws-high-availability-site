@@ -37,7 +37,7 @@ Resources:
 
 # network
 
-  VPCHighAvailabilitySite:
+  VPCWebApp:
     Type: AWS::EC2::VPC
     Properties:
       CidrBlock: !Ref VPCCidrBlock
@@ -47,11 +47,11 @@ Resources:
         - Key: EnvironmentName
           Value: !Sub ${EnvironmentName}
 
-  PrivateSubnet1HighAvailabilitySite:
+  PrivateSubnet1WebApp:
     Type: AWS::EC2::Subnet
     Properties:
       CidrBlock: !Ref PrivateSubNet1CIDR
-      VpcId: !Ref VPCHighAvailabilitySite
+      VpcId: !Ref VPCWebApp
       MapPublicIpOnLaunch: false
       AvailabilityZone: !Select [ 0, !GetAZs '' ]
       Tags: 
@@ -60,11 +60,11 @@ Resources:
         - Key: EnvironmentName
           Value: !Sub ${EnvironmentName}
 
-  PrivateSubnet2HighAvailabilitySite:
+  PrivateSubnet2WebApp:
     Type: AWS::EC2::Subnet
     Properties:
       CidrBlock: !Ref PrivateSubNet2CIDR
-      VpcId: !Ref VPCHighAvailabilitySite
+      VpcId: !Ref VPCWebApp
       MapPublicIpOnLaunch: false
       AvailabilityZone: !Select [ 1, !GetAZs '' ]
       Tags: 
@@ -73,11 +73,11 @@ Resources:
         - Key: EnvironmentName
           Value: !Sub ${EnvironmentName}
 
-  PublicSubnet1HighAvailabilitySite:
+  PublicSubnet1WebApp:
     Type: AWS::EC2::Subnet
     Properties:
       CidrBlock: !Ref PublicSubNet1CIDR
-      VpcId: !Ref VPCHighAvailabilitySite
+      VpcId: !Ref VPCWebApp
       MapPublicIpOnLaunch: false
       AvailabilityZone: !Select [ 0, !GetAZs '' ]
       Tags: 
@@ -86,11 +86,11 @@ Resources:
         - Key: EnvironmentName
           Value: !Sub ${EnvironmentName}
 
-  PublicSubnet2HighAvailabilitySite:
+  PublicSubnet2WebApp:
     Type: AWS::EC2::Subnet
     Properties:
       CidrBlock: !Ref PublicSubNet2CIDR
-      VpcId: !Ref VPCHighAvailabilitySite
+      VpcId: !Ref VPCWebApp
       MapPublicIpOnLaunch: false
       AvailabilityZone: !Select [ 1, !GetAZs '' ]
       Tags: 
@@ -99,7 +99,7 @@ Resources:
         - Key: EnvironmentName
           Value: !Sub ${EnvironmentName}
 
-  InternetGatewayHighAvailabilitySite:
+  InternetGatewayWebApp:
     Type: AWS::EC2::InternetGateway
     Properties:
       Tags: 
@@ -108,125 +108,125 @@ Resources:
         - Key: EnvironmentName
           Value: !Sub ${EnvironmentName} 
 
-  AttachInternetGateway:
+  AttachInternetGatewayVPC:
     Type: AWS::EC2::VPCGatewayAttachment
     Properties:
-      InternetGatewayId: !Ref InternetGatewayHighAvailabilitySite
-      VpcId: !Ref VPCHighAvailabilitySite
+      InternetGatewayId: !Ref InternetGatewayWebApp
+      VpcId: !Ref VPCWebApp
 
-  NATGateway1EPIHighAvailabilitySite:
+  NATGateway1EIPWebApp:
     Type: AWS::EC2::EIP
     Properties:
       Domain: vpc
-    DependsOn: AttachInternetGateway
+    DependsOn: AttachInternetGatewayVPC
 
-  NATGateway2EPIHighAvailabilitySite:
+  NATGateway2EIPWebApp:
     Type: AWS::EC2::EIP
     Properties:
       Domain: vpc
-    DependsOn: AttachInternetGateway
+    DependsOn: AttachInternetGatewayVPC
 
-  NATGateway1HighAvailabilitySite:
+  NATGateway1WebApp:
     Type: AWS::EC2::NatGateway
     Properties:
-      SubnetId: !Ref PublicSubnet1HighAvailabilitySite
-      AllocationId: !GetAtt NATGateway1EPIHighAvailabilitySite.AllocationId
+      SubnetId: !Ref PublicSubnet1WebApp
+      AllocationId: !GetAtt NATGateway1EIPWebApp.AllocationId
       Tags: 
         - Key: ProjectName
           Value: !Sub ${ProjectName}
         - Key: EnvironmentName
           Value: !Sub ${EnvironmentName} 
 
-  NATGateway2HighAvailabilitySite:
+  NATGateway2WebApp:
     Type: AWS::EC2::NatGateway
     Properties:
-      SubnetId: !Ref PublicSubnet2HighAvailabilitySite
-      AllocationId: !GetAtt NATGateway2EPIHighAvailabilitySite.AllocationId
+      SubnetId: !Ref PublicSubnet2WebApp
+      AllocationId: !GetAtt NATGateway2EIPWebApp.AllocationId
       Tags: 
         - Key: ProjectName
           Value: !Sub ${ProjectName}
         - Key: EnvironmentName
           Value: !Sub ${EnvironmentName} 
 
-  PublicRouteTableHighAvailabilitySite:
+  PublicRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
-      VpcId: !Ref VPCHighAvailabilitySite
+      VpcId: !Ref VPCWebApp
       Tags: 
         - Key: ProjectName
           Value: !Sub ${ProjectName}
         - Key: EnvironmentName
           Value: !Sub ${EnvironmentName} 
 
-  PublicRouteHighAvailabilitySite:
+  DefaultPublicRoute:
     Type: AWS::EC2::Route
     Properties:
-      RouteTableId: !Ref PublicRouteTableHighAvailabilitySite
+      RouteTableId: !Ref PublicRouteTable
       DestinationCidrBlock: 0.0.0.0/0
-      GatewayId: !Ref InternetGatewayHighAvailabilitySite
-    DependsOn: AttachInternetGateway
+      GatewayId: !Ref InternetGatewayWebApp
+    DependsOn: AttachInternetGatewayVPC
 
-  PublicRouteAssociationSubNet1HighAvailabilitySite:
+  PublicRouteSubnet1Association:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      RouteTableId: !Ref PublicRouteTableHighAvailabilitySite
-      SubnetId: !Ref PublicSubnet1HighAvailabilitySite
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet1WebApp
 
-  PublicRouteAssociationSubNet2HighAvailabilitySite:
+  PublicRouteSubnet2Association:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      RouteTableId: !Ref PublicRouteTableHighAvailabilitySite
-      SubnetId: !Ref PublicSubnet2HighAvailabilitySite
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet2WebApp
 
-  PrivateRouteTable1HighAvailabilitySite:
+  PrivateRouteTable1WebApp:
     Type: AWS::EC2::RouteTable
     Properties:
-      VpcId: !Ref VPCHighAvailabilitySite
+      VpcId: !Ref VPCWebApp
       Tags: 
         - Key: ProjectName
           Value: !Sub ${ProjectName}
         - Key: EnvironmentName
           Value: !Sub ${EnvironmentName} 
 
-  PrivateRouteSubNet1HighAvailabilitySite:
+  PrivateRouteSubnet1WebApp:
     Type: AWS::EC2::Route
     Properties:
-      RouteTableId: !Ref PrivateRouteTable1HighAvailabilitySite
+      RouteTableId: !Ref PrivateRouteTable1WebApp
       DestinationCidrBlock: 0.0.0.0/0
-      NatGatewayId: !Ref NATGateway1HighAvailabilitySite
+      NatGatewayId: !Ref NATGateway1WebApp
 
-  PrivateRouteAssociationSubNet1HighAvailabilitySite:
+  PrivateRouteSubnet1Association:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      RouteTableId: !Ref PrivateRouteTable1HighAvailabilitySite
-      SubnetId: !Ref PrivateSubnet1HighAvailabilitySite
+      RouteTableId: !Ref PrivateRouteTable1WebApp
+      SubnetId: !Ref PrivateSubnet1WebApp
 
-  PrivateRouteTable2HighAvailabilitySite:
+  PrivateRouteTable2WebApp:
     Type: AWS::EC2::RouteTable
     Properties:
-      VpcId: !Ref VPCHighAvailabilitySite
+      VpcId: !Ref VPCWebApp
       Tags: 
         - Key: ProjectName
           Value: !Sub ${ProjectName}
         - Key: EnvironmentName
           Value: !Sub ${EnvironmentName} 
 
-  PrivateRouteSubNet2HighAvailabilitySite:
+  PrivateRouteSubnet2WebApp:
     Type: AWS::EC2::Route
     Properties:
-      RouteTableId: !Ref PrivateRouteTable2HighAvailabilitySite
+      RouteTableId: !Ref PrivateRouteTable2WebApp
       DestinationCidrBlock: 0.0.0.0/0
-      NatGatewayId: !Ref NATGateway2HighAvailabilitySite
+      NatGatewayId: !Ref NATGateway2WebApp
 
-  PrivateRouteAssociationSubNet2HighAvailabilitySite:
+  PrivateRouteSubnet2Association:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      RouteTableId: !Ref PrivateRouteTable2HighAvailabilitySite
-      SubnetId: !Ref PrivateSubnet2HighAvailabilitySite
+      RouteTableId: !Ref PrivateRouteTable2WebApp
+      SubnetId: !Ref PrivateSubnet2WebApp
 
 # servers
 
-  SecurityGroupHighAvailabilitySite:
+  WebAppSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Web Application Security Group
@@ -240,9 +240,9 @@ Resources:
           FromPort: 80
           ToPort: 80
           CidrIp: "0.0.0.0/0"
-      VpcId: !Ref VPCHighAvailabilitySite
+      VpcId: !Ref VPCWebApp
 
-  LaunchConfigurationHighAvailabilitySite:
+  WebAppLaunchConfiguration:
     Type: AWS::AutoScaling::LaunchConfiguration
     Properties:
       UserData: 
@@ -258,32 +258,32 @@ Resources:
       InstanceType: "t3.small"
       IamInstanceProfile: !Ref ProfileWithRolesForOurApp
       SecurityGroups:
-        - Ref: SecurityGroupHighAvailabilitySite
+        - Ref: WebAppSecurityGroup
       BlockDeviceMappings:
         - DeviceName: "/dev/sdk"
           Ebs:
             VolumeSize: '10'
 
-  AutoScalingGroupHighAvailabilitySite:
+  WebAppAutoScalingGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
       LaunchConfigurationName: 
-        Ref: LaunchConfigurationHighAvailabilitySite
+        Ref: WebAppLaunchConfiguration
       VPCZoneIdentifier: 
-        - !Ref PrivateSubnet1HighAvailabilitySite
-        - !Ref PrivateSubnet2HighAvailabilitySite
+        - !Ref PrivateSubnet1WebApp
+        - !Ref PrivateSubnet2WebApp
       MinSize: !Sub ${AutoScalingGroupMinSize}
       MaxSize: !Sub ${AutoScalingGroupMaxSize}
       HealthCheckGracePeriod: 10
       TargetGroupARNs:
-        - !Ref WebApplicationTargetGroupHighAvailabilitySite
+        - !Ref WebAppTargetGroup
 
 # load balancer
 
-  LoadBalancerSecurityGroupHighAvailabilitySite:
+  LoadBalancerSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Load Balancer Application Security Group
+      GroupDescription: Load Balancer Security Group
       SecurityGroupEgress:
         - IpProtocol: "tcp"
           FromPort: 80
@@ -294,18 +294,18 @@ Resources:
           FromPort: 80
           ToPort: 80
           CidrIp: "0.0.0.0/0"
-      VpcId: !Ref VPCHighAvailabilitySite
+      VpcId: !Ref VPCWebApp
 
-  WebApplicationLoadBalancerHighAvailabilitySite:
+  WebAppLoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
       Subnets:
-        - !Ref PublicSubnet1HighAvailabilitySite
-        - !Ref PublicSubnet2HighAvailabilitySite
+        - !Ref PublicSubnet1WebApp
+        - !Ref PublicSubnet2WebApp
       SecurityGroups: 
-        - !Ref LoadBalancerSecurityGroupHighAvailabilitySite
+        - !Ref LoadBalancerSecurityGroup
 
-  WebApplicationTargetGroupHighAvailabilitySite:
+  WebAppTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
       HealthCheckIntervalSeconds: 10
@@ -316,34 +316,34 @@ Resources:
       Port: 80
       Protocol: "HTTP"
       UnhealthyThresholdCount: 3
-      VpcId: !Ref VPCHighAvailabilitySite
+      VpcId: !Ref VPCWebApp
 
-  LoadBalancerListenerHighAvailabilitySite:
+  WebAppLoadBalancerListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       DefaultActions:
         - Type: forward
-          TargetGroupArn: !Ref WebApplicationTargetGroupHighAvailabilitySite
-      LoadBalancerArn: !Ref WebApplicationLoadBalancerHighAvailabilitySite
+          TargetGroupArn: !Ref WebAppTargetGroup
+      LoadBalancerArn: !Ref WebAppLoadBalancer
       Port: 80
       Protocol: "HTTP"
 
-  LoadBalancerListenerRuleHighAvailabilitySite:
+  WebAppLoadBalancerListenerRule:
     Type: AWS::ElasticLoadBalancingV2::ListenerRule
     Properties:
       Actions:
         - Type: forward
-          TargetGroupArn: !Ref WebApplicationTargetGroupHighAvailabilitySite
+          TargetGroupArn: !Ref WebAppTargetGroup
       Conditions:
         - Field: path-pattern
           Values: [ "/" ]
-      ListenerArn: !Ref LoadBalancerListenerHighAvailabilitySite
+      ListenerArn: !Ref WebAppLoadBalancerListener
       Priority: 1
 
 Outputs:
 
   WebSiteAddress:
-    Description: WebSite public address
-    Value: !Join [ "://", [ "http", !GetAtt WebApplicationLoadBalancerHighAvailabilitySite.DNSName ] ]
+    Description: WebApp public address
+    Value: !Join [ "://", [ "http", !GetAtt WebAppLoadBalancer.DNSName ] ]
     Export:
-      Name: WebSiteAddressHighAvailabilitySite
+      Name: WebAppPublicAddress
