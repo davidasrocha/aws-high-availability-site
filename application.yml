@@ -260,6 +260,10 @@ Resources:
             #!/bin/bash
             apt-get update -y
             apt-get install -y unzip awscli nginx
+            cd /var/www/html
+            aws s3 cp s3://udacity-demo-1/udacity.zip .
+            unzip -o udacity.zip
+            rm -rf udacity.zip
       ImageId: !Sub ${ImageId}
       InstanceType: !Sub ${InstanceType}
       IamInstanceProfile: !Ref ProfileWithRolesForOurApp
