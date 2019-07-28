@@ -1,6 +1,5 @@
 Parameters:
 
-# network
   VPCCidrBlock:
     Type: String
 
@@ -22,16 +21,6 @@ Parameters:
   PrivateSubNet2CIDR:
     Type: String
 
-# servers
-  InstanceType:
-    Type: String
-
-  ImageId:
-    Type: String
-
-  VolumeSize:
-    Type: String
-
   AutoScalingGroupMinSize:
     Type: String
 
@@ -47,6 +36,7 @@ Resources:
         - UdacityS3ReadOnlyEC2
 
 # network
+
   VPCHighAvailabilitySite:
     Type: AWS::EC2::VPC
     Properties:
@@ -264,15 +254,15 @@ Resources:
             aws s3 cp s3://udacity-demo-1/udacity.zip .
             unzip -o udacity.zip
             rm -rf udacity.zip
-      ImageId: !Sub ${ImageId}
-      InstanceType: !Sub ${InstanceType}
+      ImageId: "ami-005bdb005fb00e791"
+      InstanceType: "t3.small"
       IamInstanceProfile: !Ref ProfileWithRolesForOurApp
       SecurityGroups:
         - Ref: SecurityGroupHighAvailabilitySite
       BlockDeviceMappings:
         - DeviceName: "/dev/sdk"
           Ebs:
-            VolumeSize: !Sub ${VolumeSize}
+            VolumeSize: '10'
 
   AutoScalingGroupHighAvailabilitySite:
     Type: AWS::AutoScaling::AutoScalingGroup
@@ -289,6 +279,7 @@ Resources:
         - !Ref WebApplicationTargetGroupHighAvailabilitySite
 
 # load balancer
+
   LoadBalancerSecurityGroupHighAvailabilitySite:
     Type: AWS::EC2::SecurityGroup
     Properties:

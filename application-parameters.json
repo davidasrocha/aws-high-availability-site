@@ -28,18 +28,6 @@
         "ParameterValue": "10.0.4.0/24"
     },
     {
-        "ParameterKey": "InstanceType",
-        "ParameterValue": "t3.small"
-    },
-    {
-        "ParameterKey": "ImageId",
-        "ParameterValue": "ami-005bdb005fb00e791"
-    },
-    {
-        "ParameterKey": "VolumeSize",
-        "ParameterValue": "10"
-    },
-    {
         "ParameterKey": "AutoScalingGroupMinSize",
         "ParameterValue": "3"
     },
