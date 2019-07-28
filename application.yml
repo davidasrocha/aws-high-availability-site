@@ -317,14 +317,14 @@ Resources:
   WebApplicationTargetGroupHighAvailabilitySite:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
-      HealthCheckIntervalSeconds: 35
+      HealthCheckIntervalSeconds: 10
       HealthCheckPath: "/"
       HealthCheckProtocol: "HTTP"
       HealthCheckTimeoutSeconds: 5
-      HealthyThresholdCount: 2
+      HealthyThresholdCount: 5
       Port: 80
       Protocol: "HTTP"
-      UnhealthyThresholdCount: 5
+      UnhealthyThresholdCount: 3
       VpcId: !Ref VPCHighAvailabilitySite
 
   LoadBalancerListenerHighAvailabilitySite:
