@@ -30,6 +30,14 @@ aws cloudformation update-stack \
     --capabilities CAPABILITY_IAM
 ```
 
+Finally, you can destroy all infrastructure run this command:
+
+```
+aws cloudformation delete-stack \
+    --stack-name udagram \
+    --region=us-west-2
+```
+
 ## How to access WebApp
 
 After create or update a stack, you can use exported value **WebAppPublicAddress** to access de public webapp address in any web browser.
