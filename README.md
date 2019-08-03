@@ -7,7 +7,7 @@ You can take a look in the infrastructure diagram [here](https://raw.githubuserc
 
 ### How to run
 
-First, you need to have configured **AWS CLI** in your computer.
+First, you need to have configured **[AWS CLI](https://aws.amazon.com/cli/)** in your computer.
 
 So, you can run this command to create a stack:
 
