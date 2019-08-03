@@ -12,31 +12,25 @@ First, you need to have configured **AWS CLI** in your computer.
 So, you can run this command to create a stack:
 
 ```
-aws cloudformation create-stack \
-    --stack-name udagram \
-    --template-body file://application.yml \
-    --parameters file://application-parameters.json \
-    --region=us-west-2 \
-    --capabilities CAPABILITY_NAMED_IAM
+./scripts/create.sh udagram us-west-2
+
+// create.sh STACK_NAME REGION
 ```
 
 If there is already stack, you can run this command to update this stack:
 
 ```
-aws cloudformation update-stack \
-    --stack-name udagram \
-    --template-body file://application.yml \
-    --parameters file://application-parameters.json \
-    --region=us-west-2 \
-    --capabilities CAPABILITY_NAMED_IAM
+./scripts/update.sh udagram us-west-2
+
+// update.sh STACK_NAME REGION
 ```
 
 Finally, you can destroy all infrastructure run this command:
 
 ```
-aws cloudformation delete-stack \
-    --stack-name udagram \
-    --region=us-west-2
+./scripts/destroy.sh udagram
+
+// destroy.sh STACK_NAME REGION
 ```
 
 ### How to access WebApp
