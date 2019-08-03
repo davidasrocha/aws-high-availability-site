@@ -17,7 +17,7 @@ aws cloudformation create-stack \
     --template-body file://application.yml \
     --parameters file://application-parameters.json \
     --region=us-west-2 \
-    --capabilities CAPABILITY_IAM
+    --capabilities CAPABILITY_NAMED_IAM
 ```
 
 If there is already stack, you can run this command to update this stack:
@@ -28,7 +28,7 @@ aws cloudformation update-stack \
     --template-body file://application.yml \
     --parameters file://application-parameters.json \
     --region=us-west-2 \
-    --capabilities CAPABILITY_IAM
+    --capabilities CAPABILITY_NAMED_IAM
 ```
 
 Finally, you can destroy all infrastructure run this command:
