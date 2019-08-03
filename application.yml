@@ -29,11 +29,35 @@ Parameters:
 
 Resources:
 
+  UdacityS3ReadOnlyEC2:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: UdacityS3ReadOnlyEC2
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "ec2.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Policies:
+        - PolicyName: "S3ReadOnlyAccess"
+          PolicyDocument: 
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "s3:GetObject"
+                Resource: "*"
+
   ProfileWithRolesForOurApp:
     Type: AWS::IAM::InstanceProfile
     Properties: 
       Roles:
-        - UdacityS3ReadOnlyEC2
+        - !Ref UdacityS3ReadOnlyEC2
+    DependsOn: UdacityS3ReadOnlyEC2
 
 # network
 
